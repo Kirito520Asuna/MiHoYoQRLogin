@@ -84,11 +84,7 @@ jobs:
           AUTO=false
           
           TAG_NAME="${{ github.event.inputs.tag_name || github.ref_name }}"
-          # 判断是否为自动触发（TAG_NAME以'v'开头）
-          if [[ "$TAG_NAME" == v* ]]; then
-              AUTO=true
-          fi
-          echo "AUTO=$AUTO" >> $GITHUB_ENV
+
           SKIP_TESTS="${{ github.event.inputs.skip_tests || true }}"
           JAVA_VERSION="${{ github.event.inputs.java_version ||secrets.JAVA_VERSION|| '8' }}"
           JAR_DIR_PREFIX="${{ github.event.inputs.jar_dir_prefix || 'QRLogin' }}"
@@ -96,6 +92,13 @@ jobs:
           PRERELEASE="${{ github.event.inputs.prerelease || false }}" 
           PUSH_TO_REGISTRY="${{ env.AUTO ||github.event.inputs.push_to_registry }}"
           PUSH_TO_GITHUB_RELEASE="${{ env.AUTO ||github.event.inputs.push_to_github_release }}"
+                    # 判断是否为自动触发（TAG_NAME以'v'开头）
+          if [[ "$TAG_NAME" == v* ]]; then
+              AUTO=true
+              PUSH_TO_REGISTRY=$AUTO
+              PUSH_TO_GITHUB_RELEASE=$AUTO
+          fi
+          echo "AUTO=$AUTO" >> $GITHUB_ENV
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           echo "SKIP_TESTS=$SKIP_TESTS" >> $GITHUB_ENV
           echo "JAVA_VERSION=$JAVA_VERSION" >> $GITHUB_ENV
