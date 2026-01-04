@@ -56,14 +56,11 @@ services:
     container_name: mihoyoqrlogin
     ports:
       - "8080:8080"
-    environment:
-      - SERVER_PORT=8080
-      - SERVER_SERVLET_CONTEXT_PATH=/ws-proxy
-      - WS_URL=ws://backend-service:8080/ws  # 连接后端服务
-      - ACCESS_TOKEN_NAME=access-token
-      - SPRING_PROFILES_ACTIVE=prod
     volumes:
       - /path/to/config.json:/app/config.json
+      - /path/to/miyoushe_qr.png:/app/miyoushe_qr.png
+      - /path/to/cookie.json:/app/cookie.json
+      - /path/to/:/app/
     networks:
       - mihoyoqrlogin-network
     restart: unless-stopped
