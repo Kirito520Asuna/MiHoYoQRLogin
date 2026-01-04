@@ -378,7 +378,7 @@ jobs:
             **Release 信息**
             - 标签: ${{ env.TAG_NAME }}
             - Java 版本: ${{ env.JAVA_VERSION}}
-            **WsProxy ${{ env.TAG_NAME }} 发布**
+            **MiHoYoQRLogin ${{ env.TAG_NAME }} 发布**
 
             ### 🏆 推荐下载（完全独立运行，无需安装 Java）
             - **MiHoYoQRLogin-Windows-${{ env.TAG_NAME }}.zip**  
