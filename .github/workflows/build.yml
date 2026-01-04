@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 name: Java Jar To Zip Publish
-run-name: "[${{ (github.event.inputs.push_to_registry == 'true' || github.event.inputs.push_to_github_release == 'true') && '正式版' || '测试版' }}] Jar ${{ github.event.inputs.tag_name || github.ref_name || 'v-manual' }}  version"
+run-name: "[${{ (github.event_name == 'push' || ((github.event.inputs.push_to_registry || github.event.inputs.push_to_github_release) == true)) && '正式版' || '测试版' }}] Jar ${{ github.event.inputs.tag_name || github.ref_name || 'v-manual' }}  version"
 
 on:
   push:
@@ -84,11 +84,7 @@ jobs:
           AUTO=false
           
           TAG_NAME="${{ github.event.inputs.tag_name || github.ref_name }}"
-          # 判断是否为自动触发（TAG_NAME以'v'开头）
-          if [[ "$TAG_NAME" == v* ]]; then
-              AUTO=true
-          fi
-          echo "AUTO=$AUTO" >> $GITHUB_ENV
+
           SKIP_TESTS="${{ github.event.inputs.skip_tests || true }}"
           JAVA_VERSION="${{ github.event.inputs.java_version ||secrets.JAVA_VERSION|| '8' }}"
           JAR_DIR_PREFIX="${{ github.event.inputs.jar_dir_prefix || 'QRLogin' }}"
@@ -96,6 +92,13 @@ jobs:
           PRERELEASE="${{ github.event.inputs.prerelease || false }}" 
           PUSH_TO_REGISTRY="${{ env.AUTO ||github.event.inputs.push_to_registry }}"
           PUSH_TO_GITHUB_RELEASE="${{ env.AUTO ||github.event.inputs.push_to_github_release }}"
+                    # 判断是否为自动触发（TAG_NAME以'v'开头）
+          if [[ "$TAG_NAME" == v* ]]; then
+              AUTO=true
+              PUSH_TO_REGISTRY=$AUTO
+              PUSH_TO_GITHUB_RELEASE=$AUTO
+          fi
+          echo "AUTO=$AUTO" >> $GITHUB_ENV
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           echo "SKIP_TESTS=$SKIP_TESTS" >> $GITHUB_ENV
           echo "JAVA_VERSION=$JAVA_VERSION" >> $GITHUB_ENV
@@ -104,7 +107,7 @@ jobs:
           echo "PRERELEASE=$PRERELEASE" >> $GITHUB_ENV
           echo "PUSH_TO_REGISTRY=$PUSH_TO_REGISTRY" >> $GITHUB_ENV
           echo "PUSH_TO_GITHUB_RELEASE=$PUSH_TO_GITHUB_RELEASE" >> $GITHUB_ENV
-          echo "设置的输入值: TAG_NAME=$TAG_NAME, SKIP_TESTS=$SKIP_TESTS, JAVA_VERSION=$JAVA_VERSION, JAR_DIR_PREFIX=$JAR_DIR_PREFIX, DRAFT=$DRAFT, PRERELEASE=$PRERELEASE,PUSH_TO_REGISTRY=$PUSH_TO_REGISTRY,PUSH_TO_GITHUB_RELEASE=$PUSH_TO_GITHUB_RELEASE"
+          echo "设置的输入值: AUTO=$AUTO ,TAG_NAME=$TAG_NAME, SKIP_TESTS=$SKIP_TESTS, JAVA_VERSION=$JAVA_VERSION, JAR_DIR_PREFIX=$JAR_DIR_PREFIX, DRAFT=$DRAFT, PRERELEASE=$PRERELEASE,PUSH_TO_REGISTRY=$PUSH_TO_REGISTRY,PUSH_TO_GITHUB_RELEASE=$PUSH_TO_GITHUB_RELEASE"
 
       - name: 4.验证版本号
         run: |
