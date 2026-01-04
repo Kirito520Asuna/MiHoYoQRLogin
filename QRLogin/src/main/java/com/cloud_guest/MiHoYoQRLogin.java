@@ -17,10 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -69,9 +66,10 @@ public class MiHoYoQRLogin {
         private String deviceModel = DEVICE_MODEL;
         private String deviceName = DEVICE_NAME;
     }
+
     public static AppConfig appConfig = new AppConfig();
 
-    public static void init(){
+    public static void init() {
         // 读取配置文件
         Map<String, String> configMap = readFromJson(CONFIG_JSON);
         if (configMap != null) {
@@ -99,6 +97,7 @@ public class MiHoYoQRLogin {
             }
         }
     }
+
     public static void main(String[] args) throws Exception {
         init();
         String appId = "1"; // 米游社
@@ -298,8 +297,56 @@ public class MiHoYoQRLogin {
             BufferedImage image = MatrixToImageWriter.toBufferedImage(matrix);
             ImageIO.write(image, MIYOUSHE_QR.substring(MIYOUSHE_QR.lastIndexOf(".") + 1), new File(MIYOUSHE_QR));
             System.out.println("二维码已保存，请用米游社APP扫码");
-
+            // 小尺寸版用于控制台打印（推荐41x41，扫码率极高）
+            // 控制台紧凑版：最小尺寸29（奇数，高纠错）
+            int compactSize = 29;
+            BitMatrix matrixSmall = new MultiFormatWriter().encode(qrUrl, BarcodeFormat.QR_CODE, compactSize, compactSize);
+            printQRCode(matrixSmall);
             return ticket;
         }
+    }
+
+    // Java 8 兼容的字符串重复方法
+    private static String repeat(String str, int times) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < times; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+    private static void printQRCode(BitMatrix matrix) {
+        System.out.println("\n米游社扫码（高度砍半版）\n");
+
+        int size = matrix.getWidth();
+
+        // 上安静区（2行半块 ≈ 4模块）
+        System.out.println(repeat("  ", size + 4));
+
+        // 主体：每两行合并一行（高度直接砍半）
+        for (int y = 0; y < size; y += 2) {
+            StringBuilder line = new StringBuilder("  ");
+
+            for (int x = 0; x < size; x++) {
+                boolean top = !matrix.get(x, y); // 反转颜色
+                boolean bottom = (y + 1 < size) && !matrix.get(x, y + 1);
+
+                char c;
+                if (top && bottom) c = '█';
+                else if (top) c = '▀';
+                else if (bottom) c = '▄';
+                else c = ' ';
+
+                line.append(c); // 只重复1次（紧凑不宽）
+            }
+
+            line.append("  ");
+            System.out.println(line);
+        }
+
+        // 下安静区
+        System.out.println(repeat("  ", size + 4));
+
+        System.out.println("\n↑↑↑ 对准上方扫码（高度已砍半，一屏覆盖）");
+        System.out.println("若显示乱码/扫不了，用 miyoushe_qr.png 图片扫！");
     }
 }
