@@ -2,6 +2,7 @@ package com.cloud_guest;
 
 import cn.hutool.core.io.FileUtil;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -43,9 +44,10 @@ public class MiHoYoQRLogin {
     // 最新URL（2026年确认仍有效）
     private static String QR_FETCH = "https://hk4e-sdk.mihoyo.com/hk4e_cn/combo/panda/qrcode/fetch";
     private static String QR_QUERY = "https://hk4e-sdk.mihoyo.com/hk4e_cn/combo/panda/qrcode/query";
-
+    private static  String TOKEN_GAME_COOKIE_API ="https://api-takumi.mihoyo.com/auth/api/getCookieAccountInfoByGameToken";
     // 反风控参数（可根据最新米游社APP抓包更新）
     private static String APP_VERSION = "2.70.1";     // 最新米游社版本
+    private static String APP_ID = "1";     // 米游社版本
     private static String CLIENT_TYPE = "5";          // 5=Android APP
     private static String SALT = "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs"; // 常用web/mobile盐
     private static String DEVICE_MODEL = "Pixel 7";   // 模拟常见Android机型
@@ -61,6 +63,7 @@ public class MiHoYoQRLogin {
     static class AppConfig {
         // 反风控参数
         private String appVersion = APP_VERSION;
+        private String appId = APP_ID;
         private String clientType = CLIENT_TYPE;
         private String salt = SALT;
         private String deviceModel = DEVICE_MODEL;
@@ -105,7 +108,7 @@ public class MiHoYoQRLogin {
 
     public static void main(String[] args) throws Exception {
         init();
-        String appId = "1"; // 米游社
+        String appId = appConfig.appId; // 米游社
         String deviceId = UUID.randomUUID().toString().replace("-", "").toUpperCase(); // 大写UUID
 
         String ticket = generateQRCode(appId, deviceId);
@@ -240,11 +243,15 @@ public class MiHoYoQRLogin {
                     String rawJson = (String) payload.get("raw");
 
                     Map<String, String> raw = gson.fromJson(rawJson, Map.class);
-                    writeWithGson(raw, COOKIE_JSON);
                     String uid = raw.get("uid");
                     String token = raw.get("token");
+                    //getMultiToken(ticket, uid);
+                    String cookieToken = getCookieAccountInfoByGameToken(token, uid);
+                    String cookie = String.format("ltoken=%s;ltuid=%s;cookie_token=%s; account_id=%s;",token, uid, cookieToken,uid);
+                    raw.put("cookie_token", cookieToken);
+                    raw.put("cookie", cookie);
+                    writeWithGson(raw, COOKIE_JSON);
 
-                    String cookie = String.format("ltuid=%s; ltoken=%s;", uid, token);
                     FileUtil.del(MIYOUSHE_QR);
                     return cookie;
                 default:
@@ -311,6 +318,41 @@ public class MiHoYoQRLogin {
         }
     }
 
+    public static String getCookieAccountInfoByGameToken(String gameToken, String account_id) throws IOException {
+        String url = TOKEN_GAME_COOKIE_API;
+        HttpUrl httpUrl = HttpUrl.parse(url).newBuilder()
+                .addQueryParameter("game_token", gameToken)
+                .addQueryParameter("account_id", account_id)
+                .build();
+        Request request = new Request.Builder()
+                .url(httpUrl)
+                .get()
+                .addHeader("x-rpc-app_id", appConfig.appId)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("请求失败: " + response.code());
+            }
+
+            String respStr = response.body().string();
+            JsonObject json = gson.fromJson(respStr, JsonObject.class);
+
+            int retcode = json.get("retcode").getAsInt();
+            if (retcode != 0) {
+                String message = json.get("message").getAsString();
+                throw new IOException("API错误: " + message);
+            }
+
+            JsonObject data = json.getAsJsonObject("data");
+            String cookie_token = data.get("cookie_token").getAsString();
+            String returnedUid = data.get("uid").getAsString();
+
+            System.out.println("获取成功！stoken: " + cookie_token);
+            System.out.println("对应UID: " + returnedUid);
+
+            return cookie_token;
+        }
+    }
     // Java 8 兼容的字符串重复方法
     private static String repeat(String str, int times) {
         StringBuilder sb = new StringBuilder();

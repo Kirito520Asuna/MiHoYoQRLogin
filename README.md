@@ -2,11 +2,10 @@
 
 这是一个用于实现米游社APP二维码登录功能的Java工具类，具有反风控机制，能够获取登录Cookie。
 
-
-
 ## 项目结构
 
-- **主程序**: [MiHoYoQRLogin.java](file://MiHoYoQRLogin\QRLogin\src\main\java\com\cloud_guest\MiHoYoQRLogin.java) - 核心二维码登录实现
+- **主程序**: [MiHoYoQRLogin.java](file://MiHoYoQRLogin\QRLogin\src\main\java\com\cloud_guest\MiHoYoQRLogin.java) -
+  核心二维码登录实现
 - **配置文件**: [config.json](file://MiHoYoQRLogin\QRLogin\src\main\resources\config.json) - 可配置反风控参数
 - **依赖管理**: Maven项目，使用[pom.xml](file://MiHoYoQRLogin\pom.xml)
 - **构建工具**: Dockerfile用于容器化部署
@@ -20,7 +19,9 @@
 - **配置化**: 支持外部配置反风控参数
 
 ### 2. 新建配置文件 config.json
+
 与.jar同一文件夹
+
 ```json
 {
   "appVersion": null,
@@ -30,18 +31,35 @@
   "deviceName": null
 }
 ```
+
+|  类别   |    名称     |   价格   |
+|:-----:|:---------:|:------:|
+| 无线网卡  |  7260AC   |   10   |
+| 光驱位托架 |     -     |   10   |
+|  CPU  |  i7-640M  |   92   |
+|  内存条  | DDR3 4Gx2 | 15x2+5 |
+| 固态硬盘  |   128G    |   42   |
+|   共   |     -     |  189   |
+
 ### 3. 运行
+
 #### 1.windows exe 直接运行
+
 前往 [release](https://github.com/Kirito520Asuna/MiHoYoQRLogin/releases) 下载 带windows的zip包解压运行.exe文件即可
+
 #### 2.java
+
 ```shell
 java -jar xxxx.jar
 ```
+
 #### 3.部署docker
+
 ```shell
 docker pull ghcr.io/kirito520asuna/mihoyoqrlogin:latest
 docker run -d -p 8081:8081 -v /path/to/config.json:/app/config.json --name mihoyoqrlogin ghcr.io/kirito520asuna/mihoyoqrlogin:latest
 ```
+
 ```shell
 # 在 docker-compose.yml 文件所在目录执行
 docker-compose up -d
@@ -81,13 +99,13 @@ networks:
 
 ## 核心参数
 
-| 参数                                                                                                             | 默认值 | 说明 |
-|----------------------------------------------------------------------------------------------------------------|--------|------|
-| [APP_VERSION](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L41-L41)                      | 2.70.1 | 米游社版本号 |
-| [CLIENT_TYPE](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L42-L42)                      | 5 | 客户端类型(5=Android APP) |
-| [SALT](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L43-L43)         | xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs | 米游社DS算法盐值 |
-| [DEVICE_MODEL](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L44-L44) | Pixel 7 | 设备型号 |
-| [DEVICE_NAME](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L45-L45)  | Google Pixel 7 | 设备名称 |
+| 参数                                                                                         | 默认值                              | 说明                   |
+|--------------------------------------------------------------------------------------------|----------------------------------|----------------------|
+| [APP_VERSION](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L41-L41)  | 2.70.1                           | 米游社版本号               |
+| [CLIENT_TYPE](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L42-L42)  | 5                                | 客户端类型(5=Android APP) |
+| [SALT](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L43-L43)         | xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs | 米游社DS算法盐值            |
+| [DEVICE_MODEL](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L44-L44) | Pixel 7                          | 设备型号                 |
+| [DEVICE_NAME](file:///./QRLogin/src/main/java/com/cloud_guest/MiHoYoQRLogin.java#L45-L45)  | Google Pixel 7                   | 设备名称                 |
 
 ## API接口
 
@@ -108,30 +126,29 @@ networks:
 ```json
 {
   "appVersion": "2.70.1",
-  "clientType": "5", 
+  "clientType": "5",
   "salt": "xV8v4Qu54lUKrEYFZkJhB8cuOh9Asafs",
   "deviceModel": "Pixel 7",
   "deviceName": "Google Pixel 7"
 }
 ```
 
-
 ## 构建与部署
 
 ### Maven构建
+
 ```bash
 mvn clean package
 ```
 
-
 ### Docker部署
+
 ```dockerfile
 FROM openjdk:8u342-jre
 VOLUME /tmp
 COPY *.jar /app/app.jar
 ENTRYPOINT ["java","-jar","/app/app.jar"]
 ```
-
 
 ## 注意事项
 
