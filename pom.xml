@@ -7,7 +7,7 @@
     <groupId>com.cloud-guest</groupId>
     <artifactId>MiHoYoQRLogin</artifactId>
     <version>${revision}</version>
-
+    <packaging>pom</packaging>
     <properties>
         <revision>v0.0.1</revision>
 
@@ -35,6 +35,9 @@
         <flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
     </properties>
 
+    <modules>
+        <module>QRLogin</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
