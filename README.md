@@ -108,7 +108,17 @@ networks:
 2. 使用米游社APP扫描二维码
 3. 在APP中确认登录
 4. 程序获取到Cookie后自动保存到 `cookie.json`
-
+5. 可以通过 `cookie.json` 获取登录后的Cookie信息
+```json
+{"uid":"15xxxx",
+"mid":"0xqxxxx",
+"is_v2_token":true,
+"token":"v2_Xxxx",
+"is_bbs":"true",
+"cookie_token":"xxx",
+"cookie":"完整的cookie字符串"
+}
+```
 ## 配置文件
 
 项目根目录下的 [config.json]() 可配置反风控参数：
