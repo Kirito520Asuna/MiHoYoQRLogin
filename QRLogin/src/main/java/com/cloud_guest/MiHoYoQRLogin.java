@@ -54,7 +54,7 @@ public class MiHoYoQRLogin {
     private static String COOKIE_JSON = "cookie.json";
     private static String CONFIG_JSON = "config.json";
 
-    @Slf4j
+    //@Slf4j
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -71,7 +71,12 @@ public class MiHoYoQRLogin {
 
     public static void init() {
         // 读取配置文件
-        Map<String, String> configMap = readFromJson(CONFIG_JSON);
+        Map<String, String> configMap = null;
+        try {
+            configMap = readFromJson(CONFIG_JSON);
+        } catch (Exception e) {
+            log.info("未找到配置文件，使用默认配置");
+        }
         if (configMap != null) {
             String appVersion = configMap.get("app_version");
             String clientType = configMap.get("client_type");
@@ -314,6 +319,7 @@ public class MiHoYoQRLogin {
         }
         return sb.toString();
     }
+
     private static void printQRCode(BitMatrix matrix) {
         System.out.println("\n米游社扫码（高度砍半版）\n");
 
