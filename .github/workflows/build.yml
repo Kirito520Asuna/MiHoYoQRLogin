@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 name: Java Jar To Zip Publish
-run-name: "[${{ (github.event.inputs.push_to_registry || github.event.inputs.push_to_github_release) && '正式版' || '测试版' }}] Jar ${{ github.event.inputs.tag_name || github.ref_name || 'v-manual' }}  version"
+run-name: "[${{ ((github.event.inputs.push_to_registry || github.event.inputs.push_to_github_release) || github.ref_name == 'v*') && '正式版' || '测试版' }}] Jar ${{ github.event.inputs.tag_name || github.ref_name || 'v-manual' }}  version"
 
 on:
   push:
