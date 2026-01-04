@@ -69,7 +69,7 @@ jobs:
           echo "Tag Name: ${{ github.event.inputs.tag_name || github.ref_name }}"
           echo "Skip Tests: ${{ github.event.inputs.skip_tests || true }}"
           echo "Java Version: ${{ github.event.inputs.java_version ||secrets.JAVA_VERSION|| '8' }}"
-          echo "Jar Dir Prefix: ${{ github.event.inputs.jar_dir_prefix || 'ws-service' }}"
+          echo "Jar Dir Prefix: ${{ github.event.inputs.jar_dir_prefix || 'QRLogin' }}"
           echo "Draft: ${{ github.event.inputs.draft || false }}"
           echo "Prerelease: ${{ github.event.inputs.prerelease || false }}"
           echo "Repository: ${{ github.repository }}"
