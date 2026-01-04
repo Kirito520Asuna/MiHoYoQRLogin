@@ -247,7 +247,7 @@ public class MiHoYoQRLogin {
                     String token = raw.get("token");
                     //getMultiToken(ticket, uid);
                     String cookieToken = getCookieAccountInfoByGameToken(token, uid);
-                    String cookie = String.format("ltoken=%s;ltuid=%s;cookie_token=%s; account_id=%s;",token, uid, cookieToken,uid);
+                    String cookie = String.format("ltoken=%s;ltuid=%s;cookie_token=%s;account_id=%s;",token, uid, cookieToken,uid);
                     raw.put("cookie_token", cookieToken);
                     raw.put("cookie", cookie);
                     writeWithGson(raw, COOKIE_JSON);
